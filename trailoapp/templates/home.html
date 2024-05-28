@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block title %}Trail Varžybos - Pagrindinis Puslapis{% endblock %}
+
+{% block content %}
+    <div class="jumbotron text-center">
+        <h1 class="display-4">Trail Varžybos</h1>
+        <p class="lead">Prisijunkite prie mūsų kitose varžybose ir patirkite nepamirštamą nuotykį gamtoje!</p>
+        <a class="btn btn-primary btn-lg" href="#" role="button">Registruokitės dabar</a>
+    </div>
+
+    <div class="upcoming-events">
+        <h2>Būsimos varžybos</h2>
+        <p>Viso planuojamų etapų: {{ stages_count }}</p>
+        <div class="row">
+            {% for stage in stages %}
+                <div class="col-md-4 mb-3">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ stage.name }}</h5>
+                            <p class="card-text">{{ stage.date }}</p>
+                            <p class="card-text">{{ stage.location }}</p>
+                            <a href="#" class="btn btn-primary">Daugiau informacijos</a>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}

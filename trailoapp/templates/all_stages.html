@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+
+{% block title %}Visos Varžybos{% endblock %}
+
+{% block content %}
+    <div class="container mt-5">
+        <h1>Visos Varžybos</h1>
+        <div class="list-group">
+            {% for stage in stages %}
+                <a href="{% url 'stage_detail' stage.id %}" class="list-group-item list-group-item-action">
+                    <h5 class="mb-1">{{ stage.name }}</h5>
+                    <p class="mb-1">{{ stage.date }}</p>
+                    <small>{{ stage.location }}</small>
+                </a>
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}
