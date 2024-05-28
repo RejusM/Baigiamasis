@@ -19,13 +19,13 @@ class UserProfile(models.Model):
     is_captain = models.BooleanField(default=False)
     phone_number = models.CharField(max_length=15, blank=True, null=True)
     address = models.CharField(max_length=100, blank=True, null=True)
-    date_of_birth = models.DateField(help_text='MMMM-mm-dd')
+    date_of_birth = models.IntegerField(help_text='Įveskite gimimo metus')
     city = models.CharField(max_length=100, )
     gender = models.CharField(max_length=10, choices=[('V', 'Vyras'), ('M', 'Moteris')])
     country = models.CharField(max_length=100)
 
     def __str__(self):
-        return self.user
+        return self.user.username
 
     class Meta:
         verbose_name = 'Profilis'

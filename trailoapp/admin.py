@@ -8,9 +8,19 @@ class TeamAdmin(admin.ModelAdmin):
 
 
 class UserProfileAdmin(admin.ModelAdmin):
-    list_display = ('user', 'gender', 'team', 'city', 'country')
-    search_fields = ('team_name', 'city', 'country')
+    list_display = ('user', 'get_first_name', 'get_last_name', 'gender', 'team', 'city', 'country')
+    search_fields = ('user__username', 'user__first_name', 'user__last_name', 'team__name', 'city', 'country')
     list_filter = ('team', 'is_captain')
+
+    def get_first_name(self, obj):
+        return obj.user.first_name
+
+    get_first_name.short_description = 'First Name'
+
+    def get_last_name(self, obj):
+        return obj.user.last_name
+
+    get_last_name.short_description = 'Last Name'
 
 
 class TrackAdmin(admin.ModelAdmin):

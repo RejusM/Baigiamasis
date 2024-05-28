@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+
+{% block title %}Registracija{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2>Registracija</h2>
+    <form method="post">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="username">Naudotojo vardas:</label>
+            <input type="text" class="form-control" id="username" name="username" required>
+        </div>
+        <div class="form-group">
+            <label for="password">Slaptažodis:</label>
+            <input type="password" class="form-control" id="password" name="password" required>
+        </div>
+        <div class="form-group">
+            <label for="password2">Patvirtinti slaptažodį:</label>
+            <input type="password" class="form-control" id="password2" name="password2" required>
+        </div>
+        <div class="form-group">
+            <label for="email">El. paštas:</label>
+            <input type="email" class="form-control" id="email" name="email" required>
+        </div>
+        <div class="form-group">
+            <label for="first_name">Vardas:</label>
+            <input type="text" class="form-control" id="first_name" name="first_name" required>
+        </div>
+        <div class="form-group">
+            <label for="last_name">Pavardė:</label>
+            <input type="text" class="form-control" id="last_name" name="last_name" required>
+        </div>
+        <div class="form-group">
+            <label for="team">Komanda:</label>
+            <select class="form-control" id="team" name="team">
+                <option value="">Pasirinkite komandą</option>
+                {% for team in teams %}
+                    <option value="{{ team.id }}">{{ team.name }}</option>
+                {% endfor %}
+            </select>
+            <label for="new_team">Arba įveskite naujos komandos pavadinimą:</label>
+            <input type="text" class="form-control" id="new_team" name="new_team">
+        </div>
+        <div class="form-group">
+            <label for="phone_number">Telefono numeris:</label>
+            <input type="text" class="form-control" id="phone_number" name="phone_number">
+        </div>
+        <div class="form-group">
+            <label for="address">Adresas:</label>
+            <input type="text" class="form-control" id="address" name="address">
+        </div>
+        <div class="form-group">
+            <label for="date_of_birth">Gimimo metai:</label>
+            <input type="number" class="form-control" id="date_of_birth" name="date_of_birth">
+        </div>
+        <div class="form-group">
+            <label for="city">Miestas:</label>
+            <input type="text" class="form-control" id="city" name="city">
+        </div>
+        <div class="form-group">
+            <label for="gender">Lytis:</label>
+            <select class="form-control" id="gender" name="gender">
+                <option value="V">Vyras</option>
+                <option value="M">Moteris</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="country">Šalis:</label>
+            <input type="text" class="form-control" id="country" name="country">
+        </div>
+        <button type="submit" class="btn btn-primary">Registruotis</button>
+    </form>
+</div>
+{% endblock %}

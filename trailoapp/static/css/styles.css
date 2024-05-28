@@ -1,7 +1,17 @@
+html, body {
+    height: 100%;
+}
+
 body {
     font-family: Arial, sans-serif;
     margin: 0;
     padding: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+main {
+    flex: 1;
 }
 
 footer {
@@ -9,4 +19,27 @@ footer {
     color: white;
     text-align: center;
     padding: 20px 0;
+    position: relative;
+    bottom: 0;
+    width: 100%;
+}
+
+.helptext {
+    display: none;
+}
+
+form .form-group {
+    margin-bottom: 1rem;
+}
+
+.container {
+    max-width: 600px;
+}
+
+.alert-dismissible .close {
+    position: absolute;
+    top: 0;
+    right: 0;
+    padding: 1rem;
+    color: inherit;
 }

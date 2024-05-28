@@ -14,7 +14,7 @@
     <header class="bg-dark text-white py-3">
         <div class="container">
             <nav class="navbar navbar-expand-lg navbar-dark">
-                <a class="navbar-brand" href="#">
+                <a class="navbar-brand" href="{% url 'home' %}">
                     <img src="{% static 'images/logo.png' %}" alt="Trail Varžybos" height="50">
                 </a>
                 <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -35,17 +35,37 @@
                                 <a class="dropdown-item" href="#">Kontaktai</a>
                             </div>
                         </li>
+                        {% if user.is_authenticated %}
+                            <li class="nav-item"><a class="nav-link" href="{% url 'logout' %}">Atsijungti</a></li>
+                        {% else %}
+                            <li class="nav-item"><a class="nav-link" href="{% url 'login' %}">Prisijungti</a></li>
+                            <li class="nav-item"><a class="nav-link" href="{% url 'register' %}">Registracija</a></li>
+                        {% endif %}
                     </ul>
                 </div>
             </nav>
         </div>
     </header>
     <main class="container my-5">
+        {% if messages %}
+            <div class="container mt-3">
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
         {% block content %}
         {% endblock %}
     </main>
     <footer class="bg-dark text-white text-center py-3">
-        <p>&copy; 2024 Trail Varžybos. All rights reserved.</p>
+        <div class="container">
+            <p>&copy; 2024 Trail Varžybos. All rights reserved.</p>
+        </div>
     </footer>
 
     <!-- Bootstrap JS and dependencies -->
