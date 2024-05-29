@@ -54,7 +54,7 @@ def register(request):
             return redirect('register')
 
         if User.objects.filter(username=username).exists():
-            messages.error(request, 'Naudotojo vardas jau egzistuoja.')
+            messages.error(request, 'Vartotojo vardas jau egzistuoja.')
             return redirect('register')
 
         user = User.objects.create_user(username=username, password=password, email=email, first_name=first_name,

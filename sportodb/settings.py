@@ -120,9 +120,6 @@ USE_TZ = True
 
 STATIC_URL = "/static/"
 
-STATICFILES_DIRS = [
-    BASE_DIR / "static",
-]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
@@ -137,3 +134,8 @@ EMAIL_PORT = 587
 EMAIL_USE_TLS = False
 EMAIL_HOST_USER = secret.EMAIL
 EMAIL_HOST_PASSWORD = secret.EMAIL_PASSWORD
+
+AUTHENTICATION_BACKENDS = [
+    'trailoapp.backends.EmailOrUsernameModelBackend',
+    'django.contrib.auth.backends.ModelBackend',
+]
