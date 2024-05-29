@@ -20,7 +20,7 @@
                             <h5 class="card-title">{{ stage.name }}</h5>
                             <p class="card-text">{{ stage.date }}</p>
                             <p class="card-text">{{ stage.location }}</p>
-                            <a href="#" class="btn btn-primary">Daugiau informacijos</a>
+                            <a href="{% url 'stage_detail' stage.id %}" class="btn btn-primary">Daugiau informacijos</a>
                         </div>
                     </div>
                 </div>

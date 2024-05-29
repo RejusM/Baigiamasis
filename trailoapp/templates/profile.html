@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+{% block title %}Mano Profilis{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2>Mano Profilis</h2>
+    {% if user.userprofile.photo %}
+        <p><img src="{{ user.userprofile.photo.url }}" alt="Profile photo" style="width:100px;height:100px;"></p>
+    <p><strong>Vartotojo vardas:</strong> {{ user.username }}</p>
+    <p><strong>El. paštas:</strong> {{ user.email }}</p>
+    <p><strong>Vardas:</strong> {{ user.first_name }}</p>
+    <p><strong>Pavardė:</strong> {{ user.last_name }}</p>
+    <p><strong>Telefono numeris:</strong> {{ user.userprofile.phone_number }}</p>
+    <p><strong>Adresas:</strong> {{ user.userprofile.address }}</p>
+    <p><strong>Gimimo metai:</strong> {{ user.userprofile.date_of_birth }}</p>
+    <p><strong>Miestas:</strong> {{ user.userprofile.city }}</p>
+    <p><strong>Lytis:</strong> {{ user.userprofile.get_gender_display }}</p>
+    <p><strong>Šalis:</strong> {{ user.userprofile.country }}</p>
+    <p><strong>Komanda:</strong> {{ user.userprofile.team.name }}</p>
+    {% endif %}
+    <a href="{% url 'edit_profile' %}" class="btn btn-primary">Redaguoti Profilį</a>
+</div>
+{% endblock %}

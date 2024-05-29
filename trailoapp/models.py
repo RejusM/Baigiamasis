@@ -15,14 +15,15 @@ class Team(models.Model):
 
 class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    team = models.ForeignKey(Team, on_delete=models.CASCADE, null=True, blank=True)
+    team = models.ForeignKey(Team, null=True, blank=True, on_delete=models.SET_NULL)
     is_captain = models.BooleanField(default=False)
     phone_number = models.CharField(max_length=15, blank=True, null=True)
-    address = models.CharField(max_length=100, blank=True, null=True)
-    date_of_birth = models.IntegerField(help_text='Įveskite gimimo metus')
-    city = models.CharField(max_length=100, )
-    gender = models.CharField(max_length=10, choices=[('V', 'Vyras'), ('M', 'Moteris')])
-    country = models.CharField(max_length=100)
+    address = models.CharField(max_length=255, blank=True, null=True)
+    date_of_birth = models.CharField(max_length=4, help_text='Įveskite gimimo metus',)
+    city = models.CharField(max_length=100, blank=True, null=True)
+    gender = models.CharField(max_length=1, choices=[('V', 'Vyras'), ('M', 'Moteris')])
+    country = models.CharField(max_length=100, blank=True, null=True)
+    photo = models.ImageField(upload_to='profile_photos/', default='default-user.png')
 
     def __str__(self):
         return self.user.username
