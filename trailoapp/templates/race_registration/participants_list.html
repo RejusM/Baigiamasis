@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block title %}Dalyvių sąrašas{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2>Dalyvių sąrašas - {{ stage.name }}</h2>
+    <ul class="list-group">
+        {% for registration in registrations %}
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+                <div>
+                    {{ registration.user_profile.user.first_name }} {{ registration.user_profile.user.last_name }} - {{ registration.track.name }}
+                </div>
+                {% if registration.status == 'p' %}
+                    <span class="badge badge-success">{{ registration.get_status_display }}</span>
+                {% elif registration.status == 'n' %}
+                    <span class="badge badge-warning">{{ registration.get_status_display }}</span>
+                {% else %}
+                    <span class="badge badge-danger">{{ registration.get_status_display }}</span>
+                {% endif %}
+            </li>
+        {% endfor %}
+    </ul>
+</div>
+{% endblock %}

@@ -23,15 +23,6 @@
     {% else %}
         <p>Prisijunkite norėdami užsiregistruoti.</p>
     {% endif %}
-    <h3>Patvirtinti dalyviai</h3>
-    <ul class="list-group mt-3">
-        {% for registration in registrations %}
-            <li class="list-group-item">
-                {{ registration.user_profile.user.username }} - Trasa: {{ registration.track.name }}
-            </li>
-        {% empty %}
-            <li class="list-group-item">Nėra patvirtintų dalyvių.</li>
-        {% endfor %}
-    </ul>
+    <a href="{% url 'participants_list' stage.id %}" class="btn btn-info">Dalyvių sąrašas</a>
 </div>
 {% endblock %}

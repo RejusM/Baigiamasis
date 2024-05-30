@@ -188,4 +188,11 @@ def register_for_race(request):
             messages.success(request, 'Jūs sėkmingai užsiregistravote į etapą!')
             return redirect('registration_list')
 
-    return render(request, 'race_registration/register_for_race.html', {'stages': stages, 'tracks': tracks, 'selected_stage_id': stage_id})
+    return render(request, 'race_registration/register_for_race.html',
+                  {'stages': stages, 'tracks': tracks, 'selected_stage_id': stage_id})
+
+
+def participants_list(request, stage_id):
+    stage = get_object_or_404(Stage, id=stage_id)
+    registrations = RaceRegistration.objects.filter(stage=stage)
+    return render(request, 'race_registration/participants_list.html', {'stage': stage, 'registrations': registrations})
