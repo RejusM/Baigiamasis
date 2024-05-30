@@ -3,22 +3,35 @@
 {% block title %}{{ stage.name }} - Detalės{% endblock %}
 
 {% block content %}
-    <div class="container mt-5">
-        <h1>{{ stage.name }}</h1>
-        <p><strong>Data:</strong> {{ stage.date }}</p>
-        <p><strong>Vieta:</strong> {{ stage.location }}</p>
-        <p><strong>Aprašymas:</strong> {{ stage.description }}</p>
-        <p><strong>Kaina:</strong> {{ stage.price }}</p>
-        <h3>Trasos:</h3>
-        <ul class="list-group">
-            {% for track in stage.tracks.all %}
-                <li class="list-group-item">
-                    <h5>{{ track.name }}</h5>
-                    <p>Info: {{ track.description }}</p>
-                    <p>Atstumas: {{ track.distance }} km</p>
-                    <p>Kaina: {{ track.price }} EUR</p>
-                </li>
-            {% endfor %}
-        </ul>
-    </div>
+<div class="container mt-5">
+    <h1>{{ stage.name }}</h1>
+    <p><strong>Data:</strong> {{ stage.date }}</p>
+    <p><strong>Vieta:</strong> {{ stage.location }}</p>
+    <p><strong>Aprašymas:</strong> {{ stage.description }}</p>
+    <h3>Trasos:</h3>
+    <ul class="list-group">
+        {% for track in stage.tracks.all %}
+            <li class="list-group-item">
+                <h5>{{ track.name }}</h5>
+                <p>Atstumas: {{ track.distance }} km</p>
+                <p>Kaina: {{ track.price }} EUR</p>
+            </li>
+        {% endfor %}
+    </ul>
+    {% if user.is_authenticated %}
+        <a href="{% url 'register_for_race' %}?stage_id={{ stage.id }}" class="btn btn-primary mt-3">Registruotis</a>
+    {% else %}
+        <p>Prisijunkite norėdami užsiregistruoti.</p>
+    {% endif %}
+    <h3>Patvirtinti dalyviai</h3>
+    <ul class="list-group mt-3">
+        {% for registration in registrations %}
+            <li class="list-group-item">
+                {{ registration.user_profile.user.username }} - Trasa: {{ registration.track.name }}
+            </li>
+        {% empty %}
+            <li class="list-group-item">Nėra patvirtintų dalyvių.</li>
+        {% endfor %}
+    </ul>
+</div>
 {% endblock %}

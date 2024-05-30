@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block title %}Registruotis į varžybas{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2>Registruotis į varžybas</h2>
+    <form method="get" action=".">
+        <div class="form-group">
+            <label for="stage">Etapas:</label>
+            <select class="form-control" id="stage" name="stage_id" onchange="this.form.submit()">
+                <option value="">Pasirinkite etapą</option>
+                {% for stage in stages %}
+                    <option value="{{ stage.id }}" {% if selected_stage_id == stage.id|stringformat:"s" %}selected{% endif %}>
+                        {{ stage.name }} - {{ stage.date }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+    </form>
+    {% if selected_stage_id %}
+    <form method="post">
+        {% csrf_token %}
+        <input type="hidden" name="stage_id" value="{{ selected_stage_id }}">
+        <div class="form-group">
+            <label for="track">Trasa:</label>
+            <select class="form-control" id="track" name="track" required>
+                <option value="">Pasirinkite trasą</option>
+                {% for track in tracks %}
+                    <option value="{{ track.id }}">{{ track.name }} - {{ track.distance }} km - {{ track.price }} €</option>
+                {% endfor %}
+            </select>
+        </div>
+        <button type="submit" class="btn btn-primary">Registruotis</button>
+    </form>
+    {% endif %}
+</div>
+{% endblock %}

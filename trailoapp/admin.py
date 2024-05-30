@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Team, UserProfile, Track, Stage, RaceResult, OverallTeamScore, OverallUserScore
+from .models import Team, UserProfile, Track, Stage, RaceResult, OverallTeamScore, OverallUserScore, RaceRegistration
 
 
 class TeamAdmin(admin.ModelAdmin):
@@ -24,7 +24,7 @@ class UserProfileAdmin(admin.ModelAdmin):
 
 
 class TrackAdmin(admin.ModelAdmin):
-    list_display = ('name', 'distance')
+    list_display = ('name', 'distance', 'price')
     search_fields = ('name',)
     list_filter = ('distance',)
 
@@ -42,6 +42,14 @@ class StageAdmin(admin.ModelAdmin):
     ordering = ('date',)
 
 
+class RaceRegistrationAdmin(admin.ModelAdmin):
+    list_display = ('user_profile', 'stage', 'track', 'registration_date', 'status')
+    search_fields = ('user_profile__user__username', 'stage__name', 'track__name')
+    list_filter = ('status', 'registration_date')
+    list_editable = ('status',)
+    readonly_fields = ('registration_date',)
+
+
 admin.site.register(Team, TeamAdmin)
 admin.site.register(UserProfile, UserProfileAdmin)
 admin.site.register(Track, TrackAdmin)
@@ -49,3 +57,4 @@ admin.site.register(Stage, StageAdmin)
 admin.site.register(RaceResult)
 admin.site.register(OverallTeamScore)
 admin.site.register(OverallUserScore)
+admin.site.register(RaceRegistration, RaceRegistrationAdmin)

@@ -87,8 +87,8 @@ class OverallTeamScore(models.Model):
         return f"{self.team.name} - {self.total_points} points"
 
     class Meta:
-        verbose_name = 'Bnedri komandų rezultatai'
-        verbose_name_plural = 'Bnedri komandų rezultatai'
+        verbose_name = 'Bendri komandų rezultatai'
+        verbose_name_plural = 'Bendri komandų rezultatai'
 
 
 class OverallUserScore(models.Model):
@@ -99,5 +99,33 @@ class OverallUserScore(models.Model):
         return f"{self.user_profile.user.username} - {self.total_points} points"
 
     class Meta:
-        verbose_name = 'Bnedri dalyvių rezultatai'
-        verbose_name_plural = 'Bnedri dalyvių rezultatai'
+        verbose_name = 'Bendri dalyvių rezultatai'
+        verbose_name_plural = 'Bendri dalyvių rezultatai'
+
+
+class RaceRegistration(models.Model):
+    user_profile = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
+    stage = models.ForeignKey(Stage, on_delete=models.CASCADE)
+    track = models.ForeignKey(Track, on_delete=models.CASCADE)
+    registration_date = models.DateTimeField(auto_now_add=True)
+    comments = models.TextField(blank=True, null=True)
+    STATUS_CHOICES = [
+        ('n', 'Nepatvirtinta'),
+        ('p', 'Patvirtinta'),
+        ('a', 'Atmesta'),
+    ]
+    status = models.CharField(
+        max_length=1,
+        choices=STATUS_CHOICES,
+        blank=True,
+        default='n',
+        help_text='Registracijos statusas',
+    )
+
+    class Meta:
+        unique_together = ('user_profile', 'stage')
+        verbose_name = 'Varžybų registracija'
+        verbose_name_plural = 'Varžybų registracijos'
+
+    def __str__(self):
+        return f"{self.user_profile.user.username} - {self.stage.name} registracija"

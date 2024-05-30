@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+
+{% block title %}Registracijų sąrašas{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2>Registracijų sąrašas</h2>
+    {% for stage, registrations in stage_registrations.items %}
+        <h3>{{ stage.name }}</h3>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Vartotojas</th>
+                    <th>Trasa</th>
+                    <th>Kaina</th>
+                    <th>Registracijos data</th>
+                    <th>Būsena</th>
+                    {% if request.user.is_staff %}
+                    <th>Veiksmai</th>
+                    {% endif %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for registration in registrations %}
+                <tr>
+                    <td>{{ registration.user_profile.user.username }}</td>
+                    <td>{{ registration.track.name }}</td>
+                    <td>{{ registration.track.price }}</td>
+                    <td>{{ registration.registration_date }}</td>
+                    <td>
+                        {% if registration.status == 'n' %}
+                            Neperžiūrėta
+                        {% elif registration.status == 'p' %}
+                            Patvirtinta
+                        {% elif registration.status == 'a' %}
+                            Atmesta
+                        {% endif %}
+                    </td>
+                    {% if request.user.is_staff %}
+                    <td>
+                        <a href="{% url 'review_registration' registration.id %}" class="btn btn-primary">Peržiūrėti</a>
+                    </td>
+                    {% endif %}
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6">Nėra registracijų šiam etapui.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% endfor %}
+</div>
+{% endblock %}
