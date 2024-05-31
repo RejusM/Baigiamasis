@@ -50,6 +50,8 @@ class Track(models.Model):
 class Stage(models.Model):
     name = models.CharField(max_length=100)
     date = models.DateTimeField()
+    registration_start = models.DateTimeField()
+    registration_end = models.DateTimeField()
     description = models.TextField(blank=True, null=True)
     location = models.CharField(max_length=255, blank=True, null=True)
     photo_link = models.URLField(blank=True, null=True)
