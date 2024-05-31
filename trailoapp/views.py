@@ -4,8 +4,9 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.views.decorators.csrf import csrf_protect
 from django.contrib.admin.views.decorators import staff_member_required
-from .models import Stage, Team, RaceRegistration, Track
-from .forms import UserUpdateForm, ProfileUpdateForm
+from django.db.models import Sum
+from .models import Stage, Team, RaceRegistration, Track, RaceResult, OverallTeamScore, OverallUserScore
+from .forms import UserUpdateForm, ProfileUpdateForm, RaceResultForm
 
 
 def home(request):
@@ -147,7 +148,7 @@ def registration_list(request):
     return render(request, 'race_registration/registration_list.html', context)
 
 
-@staff_member_required()
+@staff_member_required
 def review_registration(request, registration_id):
     registration = get_object_or_404(RaceRegistration, id=registration_id)
 
@@ -196,3 +197,84 @@ def participants_list(request, stage_id):
     stage = get_object_or_404(Stage, id=stage_id)
     registrations = RaceRegistration.objects.filter(stage=stage)
     return render(request, 'race_registration/participants_list.html', {'stage': stage, 'registrations': registrations})
+
+
+@staff_member_required
+def add_race_result(request):
+    stage_id = request.GET.get('stage_id')
+    if request.method == 'POST':
+        form = RaceResultForm(request.POST, stage_id=stage_id)
+        if form.is_valid():
+            race_result = form.save(commit=False)
+            race_result.user_profile = form.cleaned_data['user']
+            race_result.stage_id = stage_id
+            race_result.save()
+            messages.success(request, 'Rezultatas sėkmingai pridėtas.')
+            return redirect('race_result_list')
+        else:
+            messages.error(request, 'Klaida pridedant rezultatą. Patikrinkite įvestus duomenis.')
+    else:
+        form = RaceResultForm(stage_id=stage_id)
+    return render(request, 'result/add_race_result.html', {'form': form, 'stage_id': stage_id})
+
+
+def race_result_list(request):
+    stages = Stage.objects.all()
+    return render(request, 'result/race_result_list.html', {'stages': stages})
+
+
+@staff_member_required
+def edit_race_result(request, result_id):
+    result = get_object_or_404(RaceResult, id=result_id)
+    stage_id = result.stage.id
+    if request.method == 'POST':
+        form = RaceResultForm(request.POST, instance=result, stage_id=stage_id)
+        if form.is_valid():
+            race_result = form.save(commit=False)
+            race_result.user_profile = form.cleaned_data['user']
+            race_result.save()
+            messages.success(request, 'Rezultatas sėkmingai atnaujintas.')
+            return redirect('race_result_list')
+    else:
+        form = RaceResultForm(instance=result, stage_id=stage_id)
+        form.fields['user'].initial = result.user_profile
+    return render(request, 'result/edit_race_result.html', {'form': form, 'result': result})
+
+
+def personal_results(request):
+    user_profile = request.user.userprofile
+    results = RaceResult.objects.filter(user_profile=user_profile).order_by('stage__date')
+    total_points = results.aggregate(Sum('points'))['points__sum'] or 0
+    return render(request, 'result/personal_results.html', {
+        'results': results,
+        'total_points': total_points,
+    })
+
+
+def team_results(request):
+    if not request.user.userprofile.team:
+        messages.error(request, 'Jūs nepriklausote komandai.')
+        return redirect('home')
+
+    team = request.user.userprofile.team
+    results = RaceResult.objects.filter(user_profile__team=team).order_by('stage__date')
+    team_scores = results.values('stage__name').annotate(total_points=Sum('points')).order_by('stage__date')
+    return render(request, 'result/team_results.html', {
+        'team': team,
+        'results': results,
+        'team_scores': team_scores,
+    })
+
+
+def overall_user_scores(request):
+    user_scores = OverallUserScore.objects.all().order_by('-total_points')
+    return render(request, 'result/overall_user_scores.html', {
+        'user_scores': user_scores,
+    })
+
+
+def overall_team_scores(request):
+    team_scores = OverallTeamScore.objects.all().order_by('-total_points')
+    return render(request, 'result/overall_team_scores.html', {
+        'team_scores': team_scores,
+    })

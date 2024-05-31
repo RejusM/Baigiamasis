@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block title %}Varžybų rezultatai{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2>Varžybų rezultatai</h2>
+    {% for stage in stages %}
+        <h3>{{ stage.name }}</h3>
+        <a href="{% url 'add_race_result' %}?stage_id={{ stage.id }}" class="btn btn-success mb-3">Pridėti rezultatą</a>
+        <ul class="list-group">
+            {% for result in stage.raceresult_set.all %}
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <div>
+                        {{ result.user_profile.user.first_name }} {{ result.user_profile.user.last_name }} - {{ result.track.name }}: {{ result.points }} taškai, {{ result.position }} vieta
+                    </div>
+                    <div>
+                        <a href="{% url 'edit_race_result' result.id %}" class="btn btn-primary btn-sm">Redaguoti</a>
+                    </div>
+                </li>
+            {% empty %}
+                <li class="list-group-item">Nėra rezultatų</li>
+            {% endfor %}
+        </ul>
+    {% endfor %}
+</div>
+{% endblock %}
