@@ -1,6 +1,6 @@
 from django import forms
 from django.contrib.auth.models import User
-from .models import UserProfile, RaceResult, RaceRegistration, Track
+from .models import UserProfile, RaceResult, Track, Stage
 
 
 class UserUpdateForm(forms.ModelForm):
@@ -16,18 +16,33 @@ class ProfileUpdateForm(forms.ModelForm):
 
 
 class RaceResultForm(forms.ModelForm):
-    user = forms.ModelChoiceField(queryset=UserProfile.objects.none(), label="Vartotojas")
+    stage = forms.ModelChoiceField(queryset=Stage.objects.all(), label='Varžybos', required=True)
+    user = forms.ModelChoiceField(queryset=UserProfile.objects.all(), label='Vartotojas', required=True)
+    track = forms.ModelChoiceField(queryset=Track.objects.all(), label='Trasa', required=True)
 
     class Meta:
         model = RaceResult
-        fields = ['user', 'stage', 'track', 'points', 'position']
+        fields = ['stage', 'user', 'track', 'points', 'position']
 
     def __init__(self, *args, **kwargs):
-        stage_id = kwargs.pop('stage_id', None)
-        super().__init__(*args, **kwargs)
-        if stage_id:
-            self.fields['user'].queryset = UserProfile.objects.filter(
-                id__in=RaceRegistration.objects.filter(stage_id=stage_id).values_list('user_profile_id', flat=True)
-            )
-            self.fields['user'].label_from_instance = lambda obj: f"{obj.user.first_name} {obj.user.last_name}"
-            self.fields['track'].queryset = Track.objects.filter(stages__id=stage_id)
+        super(RaceResultForm, self).__init__(*args, **kwargs)
+        if 'stage_id' in self.data:
+            try:
+                stage_id = int(self.data.get('stage_id'))
+                self.fields['track'].queryset = Track.objects.filter(stages__id=stage_id)
+            except (ValueError, TypeError):
+                self.fields['track'].queryset = Track.objects.none()
+        elif self.instance.pk:
+            self.fields['track'].queryset = self.instance.stage.tracks.all()
+
+
+class StageForm(forms.Form):
+    stage = forms.ModelChoiceField(queryset=Stage.objects.all(), required=True, label="Pasirinkite etapą")
+
+
+class TrackForm(forms.Form):
+    track = forms.ModelChoiceField(queryset=Track.objects.none(), required=True, label="Pasirinkite trasą")
+
+    def __init__(self, stage, *args, **kwargs):
+        super(TrackForm, self).__init__(*args, **kwargs)
+        self.fields['track'].queryset = Track.objects.filter(raceregistration__stage=stage).distinct().order_by('name')

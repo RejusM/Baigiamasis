@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+
+
+    <h3>Dalyviai pagal etapus</h3>
+    <ul>
+        {% for stage in by_stage %}
+            <li>{{ stage.stage__name }}: {{ stage.total }} dalyvių</li>
+        {% endfor %}
+    </ul>
+
+    <h3>Dalyviai pagal komandas</h3>
+    <ul>
+        {% for team in by_team %}
+            <li>{{ team.user_profile__team__name }}: {{ team.total }} dalyvių</li>
+        {% endfor %}
+    </ul>
+
+    <h3>Dalyviai pagal lytį</h3>
+    <ul>
+        {% for gender in by_gender %}
+            <li>{{ gender.user_profile__gender }}: {{ gender.total }} dalyvių</li>
+        {% endfor %}
+    </ul>
+</div>
+{% endblock %}

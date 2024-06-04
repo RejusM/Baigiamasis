@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block title %}Dalyviai pagal trasą - {{ stage.name }}{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1>Dalyviai pagal trasą - {{ stage.name }}</h1>
+    {% for track, participants in track_participants.items %}
+        <div class="card mb-4">
+            <div class="card-header">
+                <h3>{{ track.name }}</h3>
+            </div>
+            <div class="card-body">
+                {% if participants %}
+                    <ul class="list-group">
+                        {% for participant in participants %}
+                            <li class="list-group-item">
+                                {{ participant.user_profile.user.first_name }} {{ participant.user_profile.user.last_name }}
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p>Šioje trasoje nėra užregistruotų dalyvių.</p>
+                {% endif %}
+            </div>
+        </div>
+    {% endfor %}
+</div>
+{% endblock %}

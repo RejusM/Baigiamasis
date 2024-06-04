@@ -1,27 +1,54 @@
 {% extends 'base.html' %}
 
-{% block title %}Varžybų rezultatai{% endblock %}
-
 {% block content %}
-<div class="container mt-5">
-    <h2>Varžybų rezultatai</h2>
-    {% for stage in stages %}
-        <h3>{{ stage.name }}</h3>
-        <a href="{% url 'add_race_result' %}?stage_id={{ stage.id }}" class="btn btn-success mb-3">Pridėti rezultatą</a>
-        <ul class="list-group">
-            {% for result in stage.raceresult_set.all %}
-                <li class="list-group-item d-flex justify-content-between align-items-center">
-                    <div>
-                        {{ result.user_profile.user.first_name }} {{ result.user_profile.user.last_name }} - {{ result.track.name }}: {{ result.points }} taškai, {{ result.position }} vieta
-                    </div>
-                    <div>
-                        <a href="{% url 'edit_race_result' result.id %}" class="btn btn-primary btn-sm">Redaguoti</a>
-                    </div>
-                </li>
-            {% empty %}
-                <li class="list-group-item">Nėra rezultatų</li>
+<div class="container mt-4">
+    <h1>Varžybų rezultatai</h1>
+    <form method="GET" action="{% url 'race_result_list' %}">
+        <div class="form-group">
+            <label for="stage">Pasirinkite etapą:</label>
+            <select id="stage" name="stage_id" class="form-control">
+                <option value="" disabled selected>Pasirinkite...</option>
+                {% for stage in stages %}
+                <option value="{{ stage.id }}" {% if selected_stage and selected_stage.id == stage.id %}selected{% endif %}>{{ stage.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        {% if selected_stage %}
+        <div class="form-group">
+            <label for="track">Pasirinkite trasą:</label>
+            <select id="track" name="track_id" class="form-control">
+                <option value="" disabled selected>Pasirinkite...</option>
+                {% for track in selected_stage.tracks.all %}
+                <option value="{{ track.id }}" {% if selected_track and selected_track.id == track.id %}selected{% endif %}>{{ track.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        {% endif %}
+        <button type="submit" class="btn btn-primary">Peržiūrėti rezultatus</button>
+    </form>
+
+    {% if results %}
+    <h2>Rezultatai etapui: {{ selected_stage.name }} trasai: {{ selected_track.name }}</h2>
+    <table class="table table-striped mt-4">
+        <thead>
+            <tr>
+                <th>Vieta</th>
+                <th>Vartotojas</th>
+                <th>Taškai</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for result in results %}
+            <tr>
+                <td>{{ forloop.counter }}</td>
+                <td>{{ result.user_profile.user.username }}</td>
+                <td>{{ result.points }}</td>
+            </tr>
             {% endfor %}
-        </ul>
-    {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p>Rezultatų nėra.</p>
+    {% endif %}
 </div>
 {% endblock %}

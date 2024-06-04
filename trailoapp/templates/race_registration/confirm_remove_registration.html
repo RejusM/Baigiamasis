@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block title %}Patvirtinti Pašalinimą{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2>Patvirtinti Pašalinimą</h2>
+    <p>Ar tikrai norite pašalinti šią registraciją?</p>
+    <form method="post" action="{% url 'remove_registration' registration.id %}">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger">Pašalinti</button>
+        <a href="{% url 'profile' %}" class="btn btn-secondary">Atšaukti</a>
+    </form>
+</div>
+{% endblock %}

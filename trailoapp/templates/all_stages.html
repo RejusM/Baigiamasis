@@ -1,17 +1,37 @@
 {% extends 'base.html' %}
 
-{% block title %}Visos Varžybos{% endblock %}
+{% block title %}Visi etapai{% endblock %}
 
 {% block content %}
     <div class="container mt-5">
-        <h1>Visos Varžybos</h1>
+        <h1>Visi etapai</h1>
         <div class="list-group">
             {% for stage in stages %}
-                <a href="{% url 'stage_detail' stage.id %}" class="list-group-item list-group-item-action">
-                    <h5 class="mb-1">{{ stage.name }}</h5>
-                    <p class="mb-1">{{ stage.date }}</p>
-                    <small>{{ stage.location }}</small>
-                </a>
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ stage.name }}</h5>
+                        <p class="card-text">{{ stage.date|date:"F j, Y, P" }}</p>
+                        <p class="card-text">{{ stage.location }}</p>
+                        {% if stage.registration_end > now %}
+                            <p class="card-text">Registracija baigsis: {{ stage.registration_end|date:"F j, Y, P" }}</p>
+                            <a href="{% url 'register_for_race' %}?stage_id={{ stage.id }}" class="btn btn-primary">Registracija</a>
+                        {% elif stage.registration_start > now %}
+                            <p class="card-text">Registracija prasidės: {{ stage.registration_start|date:"F j, Y, P" }}</p>
+                        {% else %}
+                            <p class="card-text">Registracija pasibaigė</p>
+                        {% endif %}
+                        {% if stage.raceresult_set.exists %}
+                            <a href="{% url 'stage_results' stage.id %}" class="btn btn-primary">Rezultatai</a>
+                        {% else %}
+                            <p class="card-text">Rezultatų dar nėra</p>
+                        {% endif %}
+                        <a href="{% url 'participants_by_track' stage.id %}" class="btn btn-secondary">Dalyvių sąrašas</a>
+                        {% if user.is_staff %}
+                            <a href="{% url 'add_race_result' %}?stage_id={{ stage.id }}" class="btn btn-success">Pridėti rezultatus</a>
+                            <a href="{% url 'review_registrations' stage.id %}" class="btn btn-warning">Peržiūrėti paraiškas</a>
+                        {% endif %}
+                    </div>
+                </div>
             {% endfor %}
         </div>
     </div>

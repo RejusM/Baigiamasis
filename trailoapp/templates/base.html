@@ -24,23 +24,40 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ml-auto">
-                    <li class="nav-item"><a class="nav-link" href="{% url 'all_stages' %}">Varžybos</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'all_stages' %}">Visi Etapai</a></li>
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="resultsDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             Rezultatai
                         </a>
                         <div class="dropdown-menu" aria-labelledby="resultsDropdown">
+                            {% if user.is_authenticated %}
                             <a class="dropdown-item" href="{% url 'personal_results' %}">Asmeniniai rezultatai</a>
                             <a class="dropdown-item" href="{% url 'team_results' %}">Komandų rezultatai</a>
+                            {% endif %}
                             <a class="dropdown-item" href="{% url 'overall_user_scores' %}">Bendri dalyvių rezultatai</a>
                             <a class="dropdown-item" href="{% url 'overall_team_scores' %}">Bendri komandų rezultatai</a>
+                            <a class="dropdown-item" href="{% url 'results_statistics' %}">Rezultatų statistika</a>
+                            {% for stage in stages %}
+                            <a class="dropdown-item" href="{% url 'stage_results' stage.id %}">Rezultatai etapui: {{ stage.name }}</a>
+                            {% endfor %}
                         </div>
-                    </li>
-                    <li class="nav-item"><a class="nav-link" href="#">Galerija</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#">Kontaktai</a></li>
+
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="statisticsDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            Statistika
+                        </a>
+                        <div class="dropdown-menu" aria-labelledby="statisticsDropdown">
+                            {% for stage in stages %}
+                            <a class="dropdown-item" href="{% url 'participants_statistics' stage.id %}">Dalyvių statistika: {{ stage.name }}</a>
+                            {% endfor %}
+                            <a class="dropdown-item" href="{% url 'results_statistics' %}">Rezultatų statistika</a>
+                        </div>
+                        </li>
+
+                    <li class="nav-item"><a class="nav-link" href="{% url 'register_for_race' %}">Etapų Registracija</a></li>
                     {% if user.is_authenticated %}
                         {% if user.is_staff %}
-                            <li class="nav-item"><a class="nav-link" href="{% url 'registration_list' %}">Visos registracijos</a></li>
+
                         {% endif %}
                         <li class="nav-item">
                             <a class="nav-link" href="{% url 'profile' %}">{{ user.get_full_name|default:user.username }}</a>

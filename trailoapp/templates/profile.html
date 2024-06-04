@@ -21,4 +21,35 @@
     {% endif %}
     <a href="{% url 'edit_profile' %}" class="btn btn-primary">Redaguoti Profilį</a>
 </div>
+
+<div class="container mt-5">
+    <h2>Jūsų registracijos</h2>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Etapas</th>
+                <th>Trasa</th>
+                <th>Veiksmai</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for registration in registrations %}
+                <tr>
+                    <td>{{ registration.stage.name }}</td>
+                    <td>{{ registration.track.name }}</td>
+                    <td>
+                        {% if registration.status == 'Registracija galima' %}
+                            <form method="post" action="{% url 'confirm_remove_registration' registration.id %}">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-danger">Pašalinti</button>
+                            </form>
+                        {% else %}
+                            {{ registration.status }}
+                        {% endif %}
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
 {% endblock %}

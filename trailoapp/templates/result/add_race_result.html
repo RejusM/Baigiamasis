@@ -1,13 +1,30 @@
 {% extends 'base.html' %}
 
-{% block title %}Pridėti rezultatą{% endblock %}
-
 {% block content %}
-<div class="container mt-5">
-    <h2>Pridėti rezultatą</h2>
-    <form method="post">
+<div class="container mt-4">
+    <h1>Pridėti rezultatą</h1>
+    <form method="POST" action="">
         {% csrf_token %}
-        {{ form.as_p }}
+        <div class="form-group">
+            <label for="stage">Varžybos:</label>
+            {{ form.stage }}
+        </div>
+        <div class="form-group">
+            <label for="user">Vartotojas:</label>
+            {{ form.user }}
+        </div>
+        <div class="form-group">
+            <label for="track">Trasa:</label>
+            {{ form.track }}
+        </div>
+        <div class="form-group">
+            <label for="points">Taškai:</label>
+            {{ form.points }}
+        </div>
+        <div class="form-group">
+            <label for="position">Vieta:</label>
+            {{ form.position }}
+        </div>
         <button type="submit" class="btn btn-primary">Pridėti</button>
     </form>
 </div>

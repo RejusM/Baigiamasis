@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1>Komandų rezultatų statistika</h1>
+
+    {% for stage in stages %}
+        <h2>{{ stage.name }}</h2>
+        <ol>
+            {% for team in teams_page_obj %}
+                {% for result in team.results %}
+                    {% if result.stage_id == stage.id %}
+                        <li>{{ result.user_profile__team__name }}: {{ result.total_points }} taškai</li>
+                    {% endif %}
+                {% endfor %}
+            {% endfor %}
+        </ol>
+    {% endfor %}
+
+    <div class="pagination">
+        <span class="step-links">
+            {% if teams_page_obj.has_previous %}
+                <a href="?teams_page=1">&laquo; pirma</a>
+                <a href="?teams_page={{ teams_page_obj.previous_page_number }}">ankstesnė</a>
+            {% endif %}
+
+            <span class="current">
+                Puslapis {{ teams_page_obj.number }} iš {{ teams_page_obj.paginator.num_pages }}.
+            </span>
+
+            {% if teams_page_obj.has_next %}
+                <a href="?teams_page={{ teams_page_obj.next_page_number }}">sekanti</a>
+                <a href="?teams_page={{ teams_page_obj.paginator.num_pages }}">paskutinė &raquo;</a>
+            {% endif %}
+        </span>
+    </div>
+</div>
+{% endblock %}

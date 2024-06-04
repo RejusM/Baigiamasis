@@ -4,38 +4,33 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.views.decorators.csrf import csrf_protect
 from django.contrib.admin.views.decorators import staff_member_required
-from django.db.models import Sum
+from django.db.models import Sum, Count
 from django.utils import timezone
-from .models import Stage, Team, RaceRegistration, Track, RaceResult, OverallTeamScore, OverallUserScore
-from .forms import UserUpdateForm, ProfileUpdateForm, RaceResultForm
+from django.core.paginator import Paginator
+from .models import Stage, Team, RaceRegistration, Track, RaceResult, OverallTeamScore, OverallUserScore, UserProfile
+from .forms import UserUpdateForm, ProfileUpdateForm, RaceResultForm, TrackForm, StageForm
 
 
 def home(request):
-    '''
-     Rodo pradinį puslapį su visais etapais, pagal data
+    """
+    Rodo pradinį puslapį su būsimais ir praėjusiais etapaisF
     :param request:
     :return:
-    '''
-    stages = Stage.objects.all().order_by('date')
-    stages_count = stages.count()
+    """
+    now = timezone.now()
+    upcoming_stages = Stage.objects.filter(date__gte=now).order_by('date')
+    past_stages = Stage.objects.filter(date__lt=now).order_by('-date')
     context = {
-        'stages': stages,
-        'stages_count': stages_count,
+        'upcoming_stages': upcoming_stages,
+        'past_stages': past_stages,
     }
     return render(request, 'home.html', context)
 
 
 def all_stages(request):
-    '''
-    Rodo puslapį su visų etapų sąrašu, pagal data
-    :param request:
-    :return:
-    '''
-    stages = Stage.objects.all().order_by('date')
-    context = {
-        'stages': stages
-    }
-    return render(request, 'all_stages.html', context)
+    stages = Stage.objects.all()
+    now = timezone.now()
+    return render(request, 'all_stages.html', {'stages': stages, 'now': now})
 
 
 def stage_detail(request, id):
@@ -96,7 +91,7 @@ def register_user(request):
         if User.objects.filter(email=email).exists():
             errors.append(f'El. paštas {email} jau registruotas.')
         if '@' in username:
-            errors.append('Vartotojo vardas negali turėti simbolio "@"')
+            errors.append('Vartotojo vardas negali turėti simbolio "@".')
 
         # Jei yra klaidų, grąžinama atgal į registracijos formą su klaidų pranešimais.
         if errors:
@@ -132,26 +127,20 @@ def register_user(request):
 
 @login_required
 def profile(request):
-    '''
-    Rodo prisijungusio profilio puslapį
-    :param request:
-    :return:
-    '''
     user_profile = request.user.userprofile
-    context = {
-        'user': request.user,
-        'profile': user_profile
-    }
-    return render(request, 'profile.html', context)
+    registrations = RaceRegistration.objects.filter(user_profile=user_profile)
+
+    for registration in registrations:
+        if timezone.now() > registration.stage.registration_end:
+            registration.status = 'Registracija baigėsi'
+        else:
+            registration.status = 'Registracija galima'
+
+    return render(request, 'profile.html', {'registrations': registrations})
 
 
 @login_required
 def edit_profile(request):
-    '''
-    Leidžia atnaujinti profili
-    :param request:
-    :return:
-    '''
     if request.method == 'POST':
         u_form = UserUpdateForm(request.POST, instance=request.user)
         p_form = ProfileUpdateForm(request.POST, request.FILES, instance=request.user.userprofile)
@@ -159,101 +148,93 @@ def edit_profile(request):
         if u_form.is_valid() and p_form.is_valid():
             u_form.save()
             p_form.save()
-            messages.success(request, 'Profilis atnaujintas sėkmingai!')
+            messages.success(request, f'Jūsų profilis buvo atnaujintas!')
             return redirect('profile')
-        else:
-            messages.warning(request, 'Profilis neatnaujintas, prašome patikrinti formą.')
-
     else:
         u_form = UserUpdateForm(instance=request.user)
         p_form = ProfileUpdateForm(instance=request.user.userprofile)
 
+    teams = Team.objects.all()  # Gauti visas komandas
+
     context = {
         'u_form': u_form,
-        'p_form': p_form
+        'p_form': p_form,
+        'teams': teams  # Perduoti komandas šablonui
     }
 
     return render(request, 'edit_profile.html', context)
 
 
-@login_required
-def registration_list(request):
-    '''
-    Rodo sąrašą visu etapu, vartotojas mato visas registracijas
-    :param request:
-    :return:
-    '''
-    stages = Stage.objects.all()
-    stage_registrations = {
-        stage: RaceRegistration.objects.filter(stage=stage) for stage in stages
-    }
-    context = {
-        'stage_registrations': stage_registrations,
-    }
-    return render(request, 'race_registration/registration_list.html', context)
-
-
 @staff_member_required
-def review_registration(request, registration_id):
-    '''
-    Leidžia adminui atnaujinti stausa, bei komentarus
+def review_registrations(request, stage_id):
+    """
+    Leidžia adminui peržiūrėti ir atnaujinti visų paraiškų statusą pagal etapą
     :param request:
-    :param registration_id:
+    :param stage_id:
     :return:
-    '''
-    registration = get_object_or_404(RaceRegistration, id=registration_id)
+    """
+    stage = get_object_or_404(Stage, id=stage_id)
+    registrations = RaceRegistration.objects.filter(stage=stage)
 
-    if request.method == 'POST':
-        status = request.POST.get('status')
-        comments = request.POST.get('comments')
-        registration.status = status
-        registration.comments = comments
-        registration.save()
-        messages.success(request, 'Registracijos būsena atnaujinta sėkmingai!')
-        return redirect('registration_list')
+    if request.method == "POST":
+        registration_id = request.POST.get("registration_id")
+        registration = get_object_or_404(RaceRegistration, id=registration_id)
+        status = request.POST.get("status")
 
-    context = {
-        'registration': registration,
-    }
-    return render(request, 'race_registration/review_registration.html', context)
+        if status == "Atmesta":
+            registration.delete()
+            messages.success(request, "Paraiška atmesta ir ištrinta sėkmingai!")
+        else:
+            registration.status = status
+            registration.save()
+            messages.success(request, "Paraiška atnaujinta sėkmingai!")
+
+        return redirect("review_registrations", stage_id=stage.id)
+
+    for registration in registrations:
+        registration.full_name = f"{registration.user_profile.user.first_name} {registration.user_profile.user.last_name}"
+
+    return render(request, 'race_registration/review_registrations.html',
+                  {'stage': stage, 'registrations': registrations})
 
 
 @login_required
 def register_for_race(request):
-    '''
-    Registracija i stage(etapus)
+    """
+    Registracija i etapus
     :param request:
     :return:
-    '''
+    """
+    now = timezone.now()
+    stages = Stage.objects.filter(registration_end__gt=now)
+
     stage_id = request.GET.get('stage_id')
-    stages = Stage.objects.all()
+    selected_stage = get_object_or_404(Stage, id=stage_id) if stage_id else None
     tracks = Track.objects.filter(stages__id=stage_id) if stage_id else Track.objects.none()
 
-    if request.method == 'POST':
+    if request.method == 'POST' and selected_stage:
         user_profile = request.user.userprofile
-        stage_id = request.POST['stage_id']
         track_id = request.POST['track']
-        stage = get_object_or_404(Stage, id=stage_id)
         track = get_object_or_404(Track, id=track_id)
 
-        now = timezone.now()
-        if not (stage.registration_start <= now <= stage.registration_end):
-            messages.warning(request, 'Registracija į šį etapą neprasidėjo arba jau uždaryta')
-            return redirect('participants_list', stage_id=stage_id)
-
-        # Patikrina, ar vartotojas jau užsiregistravo į bet kurią trasą šiame etape
-        existing_registration = RaceRegistration.objects.filter(user_profile=user_profile, stage=stage)
+        existing_registration = RaceRegistration.objects.filter(user_profile=user_profile, stage=selected_stage)
         if existing_registration.exists():
             registered_track = existing_registration.first().track
             messages.warning(request, f'Jūs jau esate užsiregistravęs į trasą "{registered_track.name}" šiame etape.')
+            return redirect('participants_list')
         else:
-            registration = RaceRegistration(user_profile=user_profile, stage=stage, track=track)
+            registration = RaceRegistration(user_profile=user_profile, stage=selected_stage, track=track)
             registration.save()
             messages.success(request, 'Jūs sėkmingai užsiregistravote į etapą!')
             return redirect('registration_list')
 
-    return render(request, 'race_registration/register_for_race.html',
-                  {'stages': stages, 'tracks': tracks, 'selected_stage_id': stage_id})
+    return render(request, 'race_registration/register_for_race.html', {
+        'stages': stages,
+        'tracks': tracks,
+        'selected_stage_id': stage_id,
+        'selected_stage': selected_stage,
+        'now': now
+    })
 
 
 def participants_list(request, stage_id):
@@ -270,36 +251,54 @@ def participants_list(request, stage_id):
 
 @staff_member_required
 def add_race_result(request):
-    '''
+    """
     Leidžia pridėti naujus varžybų rezultatus
     :param request:
     :return:
-    '''
-    stage_id = request.GET.get('stage_id')
+    """
     if request.method == 'POST':
-        form = RaceResultForm(request.POST, stage_id=stage_id)
+        form = RaceResultForm(request.POST)
         if form.is_valid():
             race_result = form.save(commit=False)
             race_result.user_profile = form.cleaned_data['user']
-            race_result.stage_id = stage_id
             race_result.save()
             messages.success(request, 'Rezultatas sėkmingai pridėtas.')
             return redirect('race_result_list')
         else:
             messages.error(request, 'Klaida pridedant rezultatą. Patikrinkite įvestus duomenis.')
     else:
-        form = RaceResultForm(stage_id=stage_id)
-    return render(request, 'result/add_race_result.html', {'form': form, 'stage_id': stage_id})
+        form = RaceResultForm()
+
+    return render(request, 'result/add_race_result.html', {'form': form})
 
 
 def race_result_list(request):
-    '''
-     Rodo visus varžybų rezultatus
+    """
+    Rodo visus varžybų rezultatus pagal pasirinktą etapą ir trasą
     :param request:
     :return:
-    '''
+    """
     stages = Stage.objects.all()
-    return render(request, 'result/race_result_list.html', {'stages': stages})
+    selected_stage_id = request.GET.get('stage_id')
+    selected_track_id = request.GET.get('track_id')
+    selected_stage = None
+    selected_track = None
+    results = None
+
+    if selected_stage_id:
+        selected_stage = get_object_or_404(Stage, id=selected_stage_id)
+        tracks = selected_stage.tracks.all()
+
+        if selected_track_id:
+            selected_track = get_object_or_404(Track, id=selected_track_id, stages=selected_stage)
+            results = RaceResult.objects.filter(stage=selected_stage, track=selected_track).order_by('position')
+
+    return render(request, 'result/race_result_list.html', {
+        'stages': stages,
+        'selected_stage': selected_stage,
+        'selected_track': selected_track,
+        'results': results
+    })
 
 
 @staff_member_required
@@ -383,3 +382,166 @@ def overall_team_scores(request):
     return render(request, 'result/overall_team_scores.html', {
         'team_scores': team_scores,
     })
+
+
+def participants_statistics(request, stage_id):
+    """
+    Statistika pagal etapą, kiek dalyvių yra komandoje, kiek yra vyrų/moterų, ir pagal trasą
+    :param request:
+    :param stage_id:
+    :return:
+    """
+    stage = get_object_or_404(Stage, id=stage_id)
+    participants_by_stage = RaceRegistration.objects.filter(stage=stage).values('stage__name').annotate(
+        total=Count('user_profile', distinct=True))
+    participants_by_team = RaceRegistration.objects.filter(stage=stage).values('user_profile__team__name').annotate(
+        total=Count('user_profile', distinct=True))
+    participants_by_gender = RaceRegistration.objects.filter(stage=stage).values('user_profile__gender').annotate(
+        total=Count('user_profile', distinct=True))
+    participants_by_track = RaceRegistration.objects.filter(stage=stage).values('track__name').annotate(
+        total=Count('user_profile', distinct=True))
+
+    context = {
+        'stage': stage,
+        'by_stage': participants_by_stage,
+        'by_team': participants_by_team,
+        'by_gender': participants_by_gender,
+        'by_track': participants_by_track,
+    }
+
+    return render(request, 'statistics/participants_statistics.html', context)
+
+
+def participants_by_track_statistics(request, stage_id):
+    """
+    Statistika pagal trasą konkrečiam etapui
+    :param request:
+    :param stage_id:
+    :return:
+    """
+    stage = get_object_or_404(Stage, id=stage_id)
+    participants_by_track = RaceRegistration.objects.filter(stage=stage).values('track__name').annotate(
+        total=Count('user_profile', distinct=True))
+
+    context = {
+        'stage': stage,
+        'by_track': participants_by_track,
+    }
+
+    return render(request, 'statistics/participants_by_track_statistics.html', context)
+
+
+def results_statistics(request):
+    '''
+    Rezultatų statistiką
+    :param request:
+    :return:
+    '''
+    stages = Stage.objects.all()
+    result_list = []
+
+    for stage in stages:
+        stage_results = RaceResult.objects.filter(stage=stage).values('user_profile__user__username').annotate(
+            total_points=Sum('points')).order_by('-total_points')
+        result_list.append({
+            'stage': stage,
+            'results': stage_results
+        })
+
+    performers_paginator = Paginator(result_list, 10)
+    performers_page_number = request.GET.get('performers_page')
+    performers_page_obj = performers_paginator.get_page(performers_page_number)
+
+    return render(request, 'statistics/results_statistics.html', {
+        'performers_page_obj': performers_page_obj,
+        'stages': stages
+    })
+
+
+def team_results_statistics(request):
+    '''
+    Komandų rezultatų statistika
+    :param request:
+    :return:
+    '''
+    stages = Stage.objects.all()
+    team_list = []
+
+    for stage in stages:
+        stage_results = RaceResult.objects.filter(stage=stage).values('user_profile__team__name').annotate(
+            total_points=Sum('points')).order_by('-total_points')
+        team_list.append({
+            'stage': stage,
+            'results': stage_results
+        })
+
+    teams_paginator = Paginator(team_list, 10)  # 10 komandų viename puslapyje
+    teams_page_number = request.GET.get('teams_page')
+    teams_page_obj = teams_paginator.get_page(teams_page_number)
+
+    return render(request, 'statistics/team_results_statistics.html', {
+        'teams_page_obj': teams_page_obj,
+        'stages': stages
+    })
+
+
+def filtered_results(request):
+    stage_form = StageForm(request.GET or None)
+    track_form = None
+    results = RaceResult.objects.none()
+
+    if stage_form.is_valid():
+        stage = stage_form.cleaned_data.get('stage')
+        track_form = TrackForm(stage, request.GET or None)
+
+        if track_form.is_valid():
+            track = track_form.cleaned_data.get('track')
+            results = RaceResult.objects.filter(stage=stage, track=track)
+
+    context = {
+        'stage_form': stage_form,
+        'track_form': track_form,
+        'results': results
+    }
+    return render(request, 'result/filtered_results.html', context)
+
+
+@login_required
+def confirm_remove_registration(request, registration_id):
+    registration = get_object_or_404(RaceRegistration, id=registration_id)
+    return render(request, 'race_registration/confirm_remove_registration.html', {'registration': registration})
+
+
+@login_required
+def remove_registration(request, registration_id):
+    registration = get_object_or_404(RaceRegistration, id=registration_id)
+    if request.method == 'POST':
+        registration.delete()
+        return redirect('profile')
+    return redirect('race_registration/confirm_remove_registration.html', registration_id=registration_id)
+
+
+def stage_results(request, stage_id):
+    stage = get_object_or_404(Stage, id=stage_id)
+    results = RaceResult.objects.filter(stage=stage).order_by('position')
+    return render(request, 'result/stage_results.html', {'stage': stage, 'results': results})
+
+
+def stage_participants(request, stage_id):
+    stage = get_object_or_404(Stage, id=stage_id)
+    participants = RaceRegistration.objects.filter(stage=stage)
+    for participant in participants:
+        participant.full_name = f"{participant.user_profile.user.first_name} {participant.user_profile.user.last_name}"
+    return render(request, 'race_registration/stage_participants.html', {'stage': stage, 'participants': participants})
+
+
+def stage_participants_by_track(request, stage_id):
+    stage = get_object_or_404(Stage, id=stage_id)
+    tracks = Track.objects.filter(stages=stage)
+    track_participants = {track: RaceRegistration.objects.filter(stage=stage, track=track) for track in tracks}
+
+    context = {
+        'stage': stage,
+        'track_participants': track_participants
+    }
+    return render(request, 'race_registration/participants_by_track.html', context)

@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+
+{% block content %}
+<div class="container mt-5">
+    <h3>{{ stage.name }} - Dalyvių statistika pagal trasą</h3>
+
+    <ul>
+        {% for item in by_track %}
+            <li>{{ item.track__name }}: {{ item.total }} dalyviai</li>
+        {% endfor %}
+    </ul>
+</div>
+{% endblock %}
