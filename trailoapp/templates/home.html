@@ -24,7 +24,6 @@
             <a href="{% url 'register_for_race' %}" class="btn btn-primary">Registracija</a>
             <a href="{% url 'participants_by_track' stage.id %}" class="btn btn-secondary">Dalyvių sąrašas</a>
             {% if user.is_authenticated %}
-            <a href="{% url 'add_race_result' %}?stage_id={{ stage.id }}" class="btn btn-success">Pridėti rezultatus</a>
             <a href="{% url 'review_registrations' stage.id %}" class="btn btn-warning">Peržiūrėti paraiškas</a>
             {% endif %}
         </div>

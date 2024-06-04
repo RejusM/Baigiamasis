@@ -36,7 +36,7 @@
                             <a class="dropdown-item" href="{% url 'overall_user_scores' %}">Bendri dalyvių rezultatai</a>
                             <a class="dropdown-item" href="{% url 'overall_team_scores' %}">Bendri komandų rezultatai</a>
                             {% for stage in stages %}
-                             {% if stage.raceresult_set.exists %}
+                            {% if stage.raceresult_set.exists %}
                             <a class="dropdown-item" href="{% url 'stage_results' stage.id %}">Rezultatai etapui: {{ stage.name }}</a>
                             {% endif %}
                             {% endfor %}
@@ -54,9 +54,6 @@
                     </li>
                     <li class="nav-item"><a class="nav-link" href="{% url 'register_for_race' %}">Etapų Registracija</a></li>
                     {% if user.is_authenticated %}
-                        {% if user.is_staff %}
-
-                        {% endif %}
                         <li class="nav-item">
                             <a class="nav-link" href="{% url 'profile' %}">{{ user.get_full_name|default:user.username }}</a>
                         </li>

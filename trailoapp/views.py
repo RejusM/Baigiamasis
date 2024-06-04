@@ -249,27 +249,27 @@ def participants_list(request, stage_id):
     return render(request, 'race_registration/participants_list.html', {'stage': stage, 'registrations': registrations})
 
 
-@staff_member_required
-def add_race_result(request):
-    """
-    Leidžia pridėti naujus varžybų rezultatus
-    :param request:
-    :return:
-    """
-    if request.method == 'POST':
-        form = RaceResultForm(request.POST)
-        if form.is_valid():
-            race_result = form.save(commit=False)
-            race_result.user_profile = form.cleaned_data['user']
-            race_result.save()
-            messages.success(request, 'Rezultatas sėkmingai pridėtas.')
-            return redirect('race_result_list')
-        else:
-            messages.error(request, 'Klaida pridedant rezultatą. Patikrinkite įvestus duomenis.')
-    else:
-        form = RaceResultForm()
-
-    return render(request, 'result/add_race_result.html', {'form': form})
+# @staff_member_required
+# def add_race_result(request):
+#     """
+#     Leidžia pridėti naujus varžybų rezultatus
+#     :param request:
+#     :return:
+#     """
+#     if request.method == 'POST':
+#         form = RaceResultForm(request.POST)
+#         if form.is_valid():
+#             race_result = form.save(commit=False)
+#             race_result.user_profile = form.cleaned_data['user']
+#             race_result.save()
+#             messages.success(request, 'Rezultatas sėkmingai pridėtas.')
+#             return redirect('race_result_list')
+#         else:
+#             messages.error(request, 'Klaida pridedant rezultatą. Patikrinkite įvestus duomenis.')
+#     else:
+#         form = RaceResultForm()
+#
+#     return render(request, 'result/add_race_result.html', {'form': form})
 
 
 def race_result_list(request):
@@ -301,28 +301,28 @@ def race_result_list(request):
     })
 
 
-@staff_member_required
-def edit_race_result(request, result_id):
-    """
-    Leidžia keisti varžybų rezultatus, bet tik staff
-    :param request:
-    :param result_id:
-    :return:
-    """
-    result = get_object_or_404(RaceResult, id=result_id)
-    stage_id = result.stage.id
-    if request.method == 'POST':
-        form = RaceResultForm(request.POST, instance=result, stage_id=stage_id)
-        if form.is_valid():
-            race_result = form.save(commit=False)
-            race_result.user_profile = form.cleaned_data['user']
-            race_result.save()
-            messages.success(request, 'Rezultatas sėkmingai atnaujintas.')
-            return redirect('race_result_list')
-    else:
-        form = RaceResultForm(instance=result, stage_id=stage_id)
-        form.fields['user'].initial = result.user_profile
-    return render(request, 'result/edit_race_result.html', {'form': form, 'result': result})
+# @staff_member_required
+# def edit_race_result(request, result_id):
+#     """
+#     Leidžia keisti varžybų rezultatus, bet tik staff
+#     :param request:
+#     :param result_id:
+#     :return:
+#     """
+#     result = get_object_or_404(RaceResult, id=result_id)
+#     stage_id = result.stage.id
+#     if request.method == 'POST':
+#         form = RaceResultForm(request.POST, instance=result, stage_id=stage_id)
+#         if form.is_valid():
+#             race_result = form.save(commit=False)
+#             race_result.user_profile = form.cleaned_data['user']
+#             race_result.save()
+#             messages.success(request, 'Rezultatas sėkmingai atnaujintas.')
+#             return redirect('race_result_list')
+#     else:
+#         form = RaceResultForm(instance=result, stage_id=stage_id)
+#         form.fields['user'].initial = result.user_profile
+#     return render(request, 'result/edit_race_result.html', {'form': form, 'result': result})
 
 
 def personal_results(request):
