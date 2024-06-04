@@ -430,34 +430,6 @@ def participants_by_track_statistics(request, stage_id):
 
     return render(request, 'statistics/participants_by_track_statistics.html', context)
 
-
-def results_statistics(request):
-    """
-    Rezultatų statistiką
-    :param request:
-    :return:
-    """
-    stages = Stage.objects.all()
-    result_list = []
-
-    for stage in stages:
-        stage_results = RaceResult.objects.filter(stage=stage).values('user_profile__user__username').annotate(
-            total_points=Sum('points')).order_by('-total_points')
-        result_list.append({
-            'stage': stage,
-            'results': stage_results
-        })
-
-    performers_paginator = Paginator(result_list, 10)
-    performers_page_number = request.GET.get('performers_page')
-    performers_page_obj = performers_paginator.get_page(performers_page_number)
-
-    return render(request, 'statistics/results_statistics.html', {
-        'performers_page_obj': performers_page_obj,
-        'stages': stages
-    })
-
-
 def team_results_statistics(request):
     """
     Komandų rezultatų statistika
