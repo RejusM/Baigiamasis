@@ -112,7 +112,7 @@ class RaceRegistration(models.Model):
     registration_date = models.DateTimeField(auto_now_add=True)
     comments = models.TextField(blank=True, null=True)
     STATUS_CHOICES = [
-        ('n', 'Nepatvirtinta'),
+        ('n', 'Neperžiūrėta'),
         ('p', 'Patvirtinta'),
         ('a', 'Atmesta'),
     ]

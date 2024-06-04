@@ -26,7 +26,7 @@
                             {% csrf_token %}
                             <input type="hidden" name="registration_id" value="{{ registration.id }}">
                             <select name="status" class="form-control">
-                                <option value="Nepatvirtinta" {% if registration.status == "Nepatvirtinta" %}selected{% endif %}>Nepatvirtinta</option>
+                                <option value="Nepatvirtinta" {% if registration.status == "Neperžiūrėta" %}selected{% endif %}>Neperžiūrėta</option>
                                 <option value="Patvirtinta" {% if registration.status == "Patvirtinta" %}selected{% endif %}>Patvirtinta</option>
                                 <option value="Atmesta" {% if registration.status == "Atmesta" %}selected{% endif %}>Atmesta</option>
                             </select>

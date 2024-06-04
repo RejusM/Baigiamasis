@@ -37,7 +37,9 @@
                             <a class="dropdown-item" href="{% url 'overall_team_scores' %}">Bendri komandų rezultatai</a>
                             <a class="dropdown-item" href="{% url 'results_statistics' %}">Rezultatų statistika</a>
                             {% for stage in stages %}
+                             {% if stage.raceresult_set.exists %}
                             <a class="dropdown-item" href="{% url 'stage_results' stage.id %}">Rezultatai etapui: {{ stage.name }}</a>
+                            {% endif %}
                             {% endfor %}
                         </div>
                     </li>
