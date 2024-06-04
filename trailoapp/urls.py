@@ -18,7 +18,6 @@ urlpatterns = [
     path('scores/users/', views.overall_user_scores, name='overall_user_scores'),  # Bendri dalyvių rezultatai
     path('scores/teams/', views.overall_team_scores, name='overall_team_scores'),  # Bendri komandų rezultatai
     path('participants-statistics/<int:stage_id>/', views.participants_statistics, name='participants_statistics'),  # Dalyvių statistika
-    path('results-statistics/', views.results_statistics, name='results_statistics'),  # Rezultatų statistika
     path('team-results-statistics/', views.team_results_statistics, name='team_results_statistics'),  # Komandų rezultatų statistika
     path('filtered-results/', views.filtered_results, name='filtered_results'),  # Filtruoti rezultatai pagal trasą
     path('confirm-remove-registration/<int:registration_id>/', views.confirm_remove_registration, name='confirm_remove_registration'),  # pašalinti savo registracija
