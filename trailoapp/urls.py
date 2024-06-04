@@ -9,6 +9,7 @@ urlpatterns = [
     path('profile/', views.profile, name='profile'),  # Profilis
     path('profile/edit/', views.edit_profile, name='edit_profile'),  # Profilio redagavimas
     path('race-register/', views.register_for_race, name='register_for_race'),  # Registracija į etapus
+    path('participants/<int:stage_id>/', views.participants_list, name='participants_list'),  # Etapo dalyvių sąrašas
     path('results/', views.race_result_list, name='race_result_list'),  # Visų etapų rezultatų sąrašas
     path('results/add/', views.add_race_result, name='add_race_result'),  # Pridėti rezultatus
     path('results/edit/<int:result_id>/', views.edit_race_result, name='edit_race_result'),  # Rezultato redagavimas
@@ -25,5 +26,5 @@ urlpatterns = [
     path('stages/<int:stage_id>/results/', views.stage_results, name='stage_results'),  # Etapo rezultatai
     path('stages/<int:stage_id>/participants/', views.stage_participants, name='stage_participants'),  # Etapo dalyviai
     path('stages/<int:stage_id>/review-registrations/', views.review_registrations, name='review_registrations'),  # Peržiūrėti paraiškas
-    path('participants_by_track/<int:stage_id>/', views.stage_participants_by_track, name='participants_by_track'),  # Dalyvių sąrašas pagal trasas
+    path('participants_by_track/<int:stage_id>/', views.stage_participants_by_track, name='participants_by_track'), # Dalyvių sąrašas pagal trasas
 ]

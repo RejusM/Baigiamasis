@@ -13,7 +13,7 @@ from .forms import UserUpdateForm, ProfileUpdateForm, RaceResultForm, TrackForm,
 
 def home(request):
     """
-    Rodo pradinį puslapį su būsimais ir praėjusiais etapaisF
+    Rodo pradinį puslapį su būsimais ir praėjusiais etapais
     :param request:
     :return:
     """
@@ -34,12 +34,12 @@ def all_stages(request):
 
 
 def stage_detail(request, id):
-    '''
-    Rodo detalią informacija apie pasirinkta etapa ir patvirtintas registracijas
+    """
+    Rodo detalią informacija apie pasirinkta etapą ir patvirtintas registracijas
     :param request:
     :param id:
     :return:
-    '''
+    """
     stage = get_object_or_404(Stage, id=id)
     registrations = RaceRegistration.objects.filter(stage=stage, status='p')
     context = {
@@ -201,7 +201,7 @@ def review_registrations(request, stage_id):
 @login_required
 def register_for_race(request):
     """
-    Registracija i etapus
+    Registracija į etapus
     :param request:
     :return:
     """
@@ -221,12 +221,12 @@ def register_for_race(request):
         if existing_registration.exists():
             registered_track = existing_registration.first().track
             messages.warning(request, f'Jūs jau esate užsiregistravęs į trasą "{registered_track.name}" šiame etape.')
-            return redirect('participants_list')
+            return redirect('participants_list', stage_id=selected_stage.id)
         else:
             registration = RaceRegistration(user_profile=user_profile, stage=selected_stage, track=track)
             registration.save()
             messages.success(request, 'Jūs sėkmingai užsiregistravote į etapą!')
-            return redirect('registration_list')
+            return redirect('participants_list', stage_id=selected_stage.id)
 
     return render(request, 'race_registration/register_for_race.html', {
         'stages': stages,
@@ -238,12 +238,12 @@ def register_for_race(request):
 
 
 def participants_list(request, stage_id):
-    '''
+    """
     Rodo sąrašą dalyvių, kurie užsiregistravę į konkretų etapą
     :param request:
     :param stage_id:
     :return:
-    '''
+    """
     stage = get_object_or_404(Stage, id=stage_id)
     registrations = RaceRegistration.objects.filter(stage=stage)
     return render(request, 'race_registration/participants_list.html', {'stage': stage, 'registrations': registrations})
@@ -303,12 +303,12 @@ def race_result_list(request):
 
 @staff_member_required
 def edit_race_result(request, result_id):
-    '''
+    """
     Leidžia keisti varžybų rezultatus, bet tik staff
     :param request:
     :param result_id:
     :return:
-    '''
+    """
     result = get_object_or_404(RaceResult, id=result_id)
     stage_id = result.stage.id
     if request.method == 'POST':
@@ -326,11 +326,11 @@ def edit_race_result(request, result_id):
 
 
 def personal_results(request):
-    '''
+    """
     Rodo prisijungusio naudotojo asmeninius varžybų rezultatus
     :param request:
     :return:
-    '''
+    """
     user_profile = request.user.userprofile
     results = RaceResult.objects.filter(user_profile=user_profile).order_by('stage__date')
     total_points = results.aggregate(Sum('points'))['points__sum'] or 0
@@ -341,11 +341,11 @@ def personal_results(request):
 
 
 def team_results(request):
-    '''
+    """
     Rodo prisijungusio naudotojo komandos rezultatus
     :param request:
     :return:
-    '''
+    """
     if not request.user.userprofile.team:
         messages.error(request, 'Jūs nepriklausote komandai.')
         return redirect('home')
@@ -361,11 +361,11 @@ def team_results(request):
 
 
 def overall_user_scores(request):
-    '''
+    """
     Rodo visų naudotojų bendrus rezultatus
     :param request:
     :return:
-    '''
+    """
     user_scores = OverallUserScore.objects.all().order_by('-total_points')
     return render(request, 'result/overall_user_scores.html', {
         'user_scores': user_scores,
@@ -432,11 +432,11 @@ def participants_by_track_statistics(request, stage_id):
 
 
 def results_statistics(request):
-    '''
+    """
     Rezultatų statistiką
     :param request:
     :return:
-    '''
+    """
     stages = Stage.objects.all()
     result_list = []
 
@@ -459,11 +459,11 @@ def results_statistics(request):
 
 
 def team_results_statistics(request):
-    '''
+    """
     Komandų rezultatų statistika
     :param request:
     :return:
-    '''
+    """
     stages = Stage.objects.all()
     team_list = []
 
