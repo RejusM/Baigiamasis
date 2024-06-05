@@ -28,7 +28,7 @@
                     {% if stage.raceregistration_set.exists %}
                         <a href="{% url 'participants_by_track' stage.id %}" class="btn btn-secondary">Dalyvių sąrašas</a>
                     {% endif %}
-                    {% if user.is_authenticated %}
+                    {% if user.is_staff %}
                         <a href="{% url 'review_registrations' stage.id %}" class="btn btn-warning">Peržiūrėti paraiškas</a>
                     {% endif %}
                 </div>
