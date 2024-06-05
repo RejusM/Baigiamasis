@@ -47,7 +47,7 @@
                             Statistika
                         </a>
                         <div class="dropdown-menu" aria-labelledby="statisticsDropdown">
-                            {% for stage in stages %}
+                            {% for stage in stagess %}
                             <a class="dropdown-item" href="{% url 'participants_statistics' stage.id %}">Dalyvių statistika: {{ stage.name }}</a>
                             {% endfor %}
                         </div>
