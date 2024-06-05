@@ -7,7 +7,7 @@
     <h1>{{ stage.name }}</h1>
     <p><strong>Data:</strong> {{ stage.date }}</p>
     <p><strong>Vieta:</strong> {{ stage.location }}</p>
-    <p><strong>Aprašymas:</strong> {{ stage.description }}</p>
+    <p><strong>Aprašymas:</strong> {{ stage.description|safe }}</p>
     <h3>Trasos:</h3>
     <ul class="list-group">
         {% for track in stage.tracks.all %}
@@ -18,11 +18,31 @@
             </li>
         {% endfor %}
     </ul>
-    {% if user.is_authenticated %}
-        <a href="{% url 'register_for_race' %}?stage_id={{ stage.id }}" class="btn btn-primary mt-3">Registruotis</a>
+
+    {% if stage.registration_end > now %}
+        {% if user.is_authenticated %}
+            <a href="{% url 'register_for_race' %}" class="btn btn-primary mt-3">Registruotis</a>
+        {% else %}
+            <p>Prisijunkite norėdami užsiregistruoti.</p>
+        {% endif %}
     {% else %}
-        <p>Prisijunkite norėdami užsiregistruoti.</p>
+        <p>Registracija jau pasibaigė.</p>
     {% endif %}
-    <a href="{% url 'participants_list' stage.id %}" class="btn btn-info">Dalyvių sąrašas</a>
+
+    {% if stage.raceregistration_set.exists %}
+        <a href="{% url 'participants_list' stage.id %}" class="btn btn-info mt-3">Dalyvių sąrašas</a>
+    {% else %}
+        <p>Nėra užregistruotų dalyvių.</p>
+    {% endif %}
+
+    {% if stage.raceresult_set.exists %}
+        <a href="{% url 'stage_results' stage.id %}" class="btn btn-primary mt-3">Rezultatai</a>
+    {% else %}
+        <p>Rezultatų dar nėra.</p>
+    {% endif %}
+
+    {% if user.is_staff %}
+        <a href="{% url 'review_registrations' stage.id %}" class="btn btn-warning mt-3">Peržiūrėti paraiškas</a>
+    {% endif %}
 </div>
 {% endblock %}

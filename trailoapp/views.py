@@ -4,11 +4,12 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.views.decorators.csrf import csrf_protect
 from django.contrib.admin.views.decorators import staff_member_required
-from django.db.models import Sum, Count
+from django.db.models import Sum, Count, Q
 from django.utils import timezone
 from django.core.paginator import Paginator
-from .models import Stage, Team, RaceRegistration, Track, RaceResult, OverallTeamScore, OverallUserScore, UserProfile
+from .models import Stage, Team, RaceRegistration, Track, RaceResult, OverallTeamScore, OverallUserScore
 from .forms import UserUpdateForm, ProfileUpdateForm, TrackForm, StageForm
+
 
 
 def home(request):
@@ -21,6 +22,7 @@ def home(request):
     context = {
         'upcoming_stages': upcoming_stages,
         'past_stages': past_stages,
+        'now': now,
     }
     return render(request, 'home.html', context)
 
@@ -29,7 +31,7 @@ def all_stages(request):
     """
     Rodo visus etapus su dabartiniu laiku
     """
-    stages = Stage.objects.all()  # Visi etapai
+    stages = Stage.objects.all().order_by('-date')  # Visi etapai, pagal data
     now = timezone.now()  # Dabartinis laikas
     return render(request, 'all_stages.html', {'stages': stages, 'now': now})
 
@@ -40,9 +42,11 @@ def stage_detail(request, id):
     """
     stage = get_object_or_404(Stage, id=id)  # Suranda etapą pagal ID arba grąžina 404 klaidą
     registrations = RaceRegistration.objects.filter(stage=stage, status='p')  # Patvirtintos registracijos
+    now = timezone.now()  # Dabartinis laikas
     context = {
         'stage': stage,
         'registrations': registrations,
+        'now': now
     }
     return render(request, 'stage_detail.html', context)
 
@@ -473,3 +477,14 @@ def stage_participants_by_track(request, stage_id):
     }
     return render(request, 'race_registration/participants_by_track.html',
                   context)
+
+
+def search_stages(request):
+    """
+    Paieska pagal etapa
+    :param request:
+    :return:
+    """
+    query = request.GET.get('q')
+    results = Stage.objects.filter(name__icontains=query) if query else []
+    return render(request, 'search_results.html', {'query': query, 'results': results})

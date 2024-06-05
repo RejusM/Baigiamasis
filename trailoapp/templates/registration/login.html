@@ -6,13 +6,6 @@
 {% block content %}
 <div class="container mt-5">
     <h2>Prisijungti</h2>
-    {% if messages %}
-        <div class="alert alert-info" role="alert">
-            {% for message in messages %}
-                <p>{{ message }}</p>
-            {% endfor %}
-        </div>
-    {% endif %}
     <form method="post" action="{% url 'login' %}?next={{ request.GET.next }}">
         {% csrf_token %}
         <div class="form-group">

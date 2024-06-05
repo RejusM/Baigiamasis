@@ -48,7 +48,9 @@
                         </a>
                         <div class="dropdown-menu" aria-labelledby="statisticsDropdown">
                             {% for stage in stagess %}
+                            {% if stage.raceregistration_set.exists %}
                             <a class="dropdown-item" href="{% url 'participants_statistics' stage.id %}">Dalyvių statistika: {{ stage.name }}</a>
+                            {% endif %}
                             {% endfor %}
                         </div>
                     </li>
@@ -67,11 +69,27 @@
                             <a href="{% url 'register' %}" class="nav-link">Registracija</a>
                         </li>
                     {% endif %}
+                    <form class="form-inline my-2 my-lg-0" method="GET" action="{% url 'search_stages' %}">
+                        <input class="form-control mr-sm-2" type="search" placeholder="Ieškoti etapų" aria-label="Ieškoti" name="q">
+                        <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Ieškoti</button>
+                    </form>
                 </ul>
             </div>
         </nav>
     </div>
 </header>
+
+
+<div class="container mt-3">
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}" role="alert">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+</div>
+
 <main class="container my-5">
     {% block content %}
     {% endblock %}

@@ -1,5 +1,15 @@
 from django.contrib import admin
+from django import forms
+from tinymce.widgets import TinyMCE
 from .models import Team, UserProfile, Track, Stage, RaceResult, OverallTeamScore, OverallUserScore, RaceRegistration
+
+
+class StageAdminForm(forms.ModelForm):
+    description = forms.CharField(widget=TinyMCE(attrs={'cols': 80, 'rows': 30}))
+
+    class Meta:
+        model = Stage
+        fields = '__all__'
 
 
 class TeamAdmin(admin.ModelAdmin):
@@ -35,6 +45,7 @@ class TrackInline(admin.TabularInline):
 
 
 class StageAdmin(admin.ModelAdmin):
+    form = StageAdminForm
     list_display = ('name', 'date')
     search_fields = ('name', 'date')
     list_filter = ('date',)

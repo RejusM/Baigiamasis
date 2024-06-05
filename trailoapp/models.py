@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from tinymce.models import HTMLField
 
 
 class Team(models.Model):
@@ -52,7 +53,7 @@ class Stage(models.Model):
     date = models.DateTimeField()
     registration_start = models.DateTimeField()
     registration_end = models.DateTimeField()
-    description = models.TextField(blank=True, null=True)
+    description = HTMLField(blank=True, null=True)
     location = models.CharField(max_length=255, blank=True, null=True)
     photo_link = models.URLField(blank=True, null=True)
     tracks = models.ManyToManyField(Track, related_name='stages')

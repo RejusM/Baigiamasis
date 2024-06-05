@@ -12,6 +12,7 @@
                         <h5 class="card-title">{{ stage.name }}</h5>
                         <p class="card-text">{{ stage.date|date:"F j, Y, P" }}</p>
                         <p class="card-text">{{ stage.location }}</p>
+                        <a href="{% url 'stage_detail' stage.id %}" class="btn btn-info">Daugiau informacijos</a>
                         {% if stage.registration_end > now %}
                             <p class="card-text">Registracija baigsis: {{ stage.registration_end|date:"F j, Y, P" }}</p>
                             <a href="{% url 'register_for_race' %}?stage_id={{ stage.id }}" class="btn btn-primary">Registracija</a>
@@ -25,7 +26,11 @@
                         {% else %}
                             <p class="card-text">Rezultatų dar nėra</p>
                         {% endif %}
-                        <a href="{% url 'participants_by_track' stage.id %}" class="btn btn-secondary">Dalyvių sąrašas</a>
+                        {% if stage.raceregistration_set.exists %}
+                            <a href="{% url 'participants_by_track' stage.id %}" class="btn btn-secondary">Dalyvių sąrašas</a>
+                        {% else %}
+                        <p>Dar nėra užregistruotų dalyvių</p>
+                        {% endif %}
                         {% if user.is_staff %}
                             <a href="{% url 'review_registrations' stage.id %}" class="btn btn-warning">Peržiūrėti paraiškas</a>
                         {% endif %}

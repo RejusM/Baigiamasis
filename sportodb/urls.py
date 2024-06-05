@@ -26,5 +26,6 @@ urlpatterns = [
     path('', include('trailoapp.urls')),
     path('', RedirectView.as_view(url='', permanent=True)),
     path('accounts/', include('django.contrib.auth.urls')),
+    path('tinymce/', include('tinymce.urls')),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT) \
   + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

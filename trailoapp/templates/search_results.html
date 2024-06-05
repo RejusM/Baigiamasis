@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block title %}Paieškos rezultatai{% endblock %}
+
+{% block content %}
+<h1>Paieškos rezultatai</h1>
+{% if query %}
+    <p>Paieškos terminas: <strong>{{ query }}</strong></p>
+    {% if results %}
+        <ul>
+        {% for stage in results %}
+            <li><a href="{% url 'stage_detail' stage.id %}">{{ stage.name }}</a></li>
+        {% endfor %}
+        </ul>
+    {% else %}
+        <p>Nėra rezultatų.</p>
+    {% endif %}
+{% else %}
+    <p>Prašome įvesti paieškos terminą.</p>
+{% endif %}
+{% endblock %}

@@ -2,26 +2,65 @@
 
 {% block content %}
 <div class="container mt-4">
+    <h1>{{ stage.name }} - Statistika</h1>
 
-
-    <h3>Dalyviai pagal etapus</h3>
-    <ul>
+    <h3 class="mt-4">Bendri dalyvių duomenys</h3>
+    <ul class="list-group mb-4">
         {% for stage in by_stage %}
-            <li>{{ stage.stage__name }}: {{ stage.total }} dalyvių</li>
+            <li class="list-group-item">
+                <strong>{{ stage.stage__name }}:</strong>
+                {{ stage.total }}
+                {% if stage.total == 1 %}
+                    dalyvis
+                {% else %}
+                    dalyvių
+                {% endif %}
+            </li>
         {% endfor %}
     </ul>
 
-    <h3>Dalyviai pagal komandas</h3>
-    <ul>
+    <h3 class="mt-4">Dalyviai pagal komandas</h3>
+    <ul class="list-group mb-4">
         {% for team in by_team %}
-            <li>{{ team.user_profile__team__name }}: {{ team.total }} dalyvių</li>
+            <li class="list-group-item">
+                <strong>{{ team.user_profile__team__name }}:</strong>
+                {{ team.total }}
+                {% if team.total == 1 %}
+                    dalyvis
+                {% else %}
+                    dalyvių
+                {% endif %}
+            </li>
         {% endfor %}
     </ul>
 
-    <h3>Dalyviai pagal lytį</h3>
-    <ul>
+    <h3 class="mt-4">Dalyviai pagal lytį</h3>
+    <ul class="list-group mb-4">
         {% for gender in by_gender %}
-            <li>{{ gender.user_profile__gender }}: {{ gender.total }} dalyvių</li>
+            <li class="list-group-item">
+                <strong>{{ gender.user_profile__gender }}:</strong>
+                {{ gender.total }}
+                {% if gender.total == 1 %}
+                    dalyvis
+                {% else %}
+                    dalyvių
+                {% endif %}
+            </li>
+        {% endfor %}
+    </ul>
+
+    <h3 class="mt-4">Dalyviai pagal trasas</h3>
+    <ul class="list-group mb-4">
+        {% for track in by_track %}
+            <li class="list-group-item">
+                <strong>{{ track.track__name }}:</strong>
+                {{ track.total }}
+                {% if track.total == 1 %}
+                    dalyvis
+                {% else %}
+                    dalyvių
+                {% endif %}
+            </li>
         {% endfor %}
     </ul>
 </div>
