@@ -8,7 +8,7 @@ from django.db.models import Sum, Count
 from django.utils import timezone
 from django.core.paginator import Paginator
 from .models import Stage, Team, RaceRegistration, Track, RaceResult, OverallTeamScore, OverallUserScore, UserProfile
-from .forms import UserUpdateForm, ProfileUpdateForm, RaceResultForm, TrackForm, StageForm
+from .forms import UserUpdateForm, ProfileUpdateForm, TrackForm, StageForm
 
 
 def home(request):
