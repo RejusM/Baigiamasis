@@ -35,7 +35,7 @@
                             {% endif %}
                             <a class="dropdown-item" href="{% url 'overall_user_scores' %}">Bendri dalyvių rezultatai</a>
                             <a class="dropdown-item" href="{% url 'overall_team_scores' %}">Bendri komandų rezultatai</a>
-                            {% for stage in stages %}
+                            {% for stage in stagess %}
                             {% if stage.raceresult_set.exists %}
                             <a class="dropdown-item" href="{% url 'stage_results' stage.id %}">Rezultatai etapui: {{ stage.name }}</a>
                             {% endif %}
