@@ -1,6 +1,6 @@
 # Bėgimo Varžybų Valdymo Sistema
 
- Programa, skirta trail bėgimo varžybų valdymui. Ji leidžia vartotojams registruotis į varžybas, peržiūrėti dalyvių statistiką ir matyti varžybų rezultatus. Administratoriai gali valdyti varžybas, dalyvius ir rezultatus per administratoriaus sąsają.
+ Programa, skirta  bėgimo varžybų valdymui. Ji leidžia vartotojams registruotis į varžybas, peržiūrėti dalyvių statistiką ir matyti varžybų rezultatus. Administratoriai gali valdyti varžybas, dalyvius ir rezultatus per administratoriaus sąsają.
 
 ## Funkcionalumas
 
