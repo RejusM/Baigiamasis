@@ -25,4 +25,5 @@ urlpatterns = [
     path('stages/<int:stage_id>/review-registrations/', views.review_registrations, name='review_registrations'),  # Peržiūrėti paraiškas
     path('participants_by_track/<int:stage_id>/', views.stage_participants_by_track, name='participants_by_track'), # Dalyvių sąrašas pagal trasas
     path('search/', views.search_stages, name='search_stages'),  # paieška
+    path('create-stage/', views.create_stage, name='create_stage')
 ]

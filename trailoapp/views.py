@@ -8,7 +8,7 @@ from django.db.models import Sum, Count, Q
 from django.utils import timezone
 from django.core.paginator import Paginator
 from .models import Stage, Team, RaceRegistration, Track, RaceResult, OverallTeamScore, OverallUserScore
-from .forms import UserUpdateForm, ProfileUpdateForm, TrackForm, StageForm
+from .forms import UserUpdateForm, ProfileUpdateForm, TrackForm, StageForm, StageCreationForm
 
 
 
@@ -488,3 +488,14 @@ def search_stages(request):
     query = request.GET.get('q')
     results = Stage.objects.filter(name__icontains=query) if query else []
     return render(request, 'search_results.html', {'query': query, 'results': results})
+
+
+def create_stage(request):
+    if request.method == 'POST':
+        form = StageCreationForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('all_stages')  # Nukreipimas į etapų sąrašą arba kitą tinkamą puslapį
+    else:
+        form = StageCreationForm()
+    return render(request, 'create_stage.html', {'form': form})

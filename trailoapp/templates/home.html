@@ -7,6 +7,9 @@
     <h1>Trailo bėgimas</h1>
     <p>Prisijunkite prie mūsų kitose varžybose ir patirkite nepamirštamą nuotykį gamtoje!</p>
     <a class="btn btn-primary" href="{% url 'register_for_race' %}">Registruokitės dabar</a>
+    {% if user.is_staff %}
+     <a class="btn btn-primary" href="{% url 'create_stage' %}">Sukurti etapą</a>
+    {% endif %}
 </div>
 
 <div class="container mt-5">

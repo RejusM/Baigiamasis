@@ -26,3 +26,12 @@ class TrackForm(forms.Form):
         super(TrackForm, self).__init__(*args, **kwargs)
         # Filtruoti trasas pagal pasirinktą etapą, užtikrinant, kad būtų įtrauktos tik tos trasos, kurios yra susijusios su registracijomis pasirinktame etape
         self.fields['track'].queryset = Track.objects.filter(raceregistration__stage=stage).distinct().order_by('name')
+
+class StageCreationForm(forms.ModelForm):
+    class Meta:
+        model = Stage
+        fields = ['name', 'date', 'registration_start', 'registration_end', 'description', 'location', 'photo_link', 'tracks']
+        widgets = {
+            'description': forms.Textarea(attrs={'rows': 4}),
+            'tracks': forms.CheckboxSelectMultiple(),
+        }
